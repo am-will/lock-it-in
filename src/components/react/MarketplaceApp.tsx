@@ -125,8 +125,8 @@ export function MarketplaceApp({ initialFilters }: MarketplaceAppProps) {
               </p>
             </div>
 
-            {/* Sort dropdown - narrower width */}
-            <select className="neo-input neo-select text-sm hidden sm:block w-36 shrink-0">
+            {/* Sort dropdown - narrower width with solid background */}
+            <select className="neo-input neo-select text-sm hidden sm:block w-36 shrink-0 bg-[#E0E5EC]">
               <option value="newest">Newest First</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
