@@ -1,8 +1,8 @@
 /**
  * ForceFieldBackground.tsx
  * 
- * Interactive particle background using p5.js
- * Adapted for neomorphic design with subtle blue-purple particles
+ * Interactive particle background using native Canvas API
+ * Fixed coordinate mapping for accurate mouse tracking
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -15,7 +15,8 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
-  const mouseRef = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const smoothedMouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -25,13 +26,27 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
+    // Set canvas size to match display size exactly
     const resize = () => {
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
+      const rect = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Set actual canvas pixel dimensions
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      
+      // Scale context for retina displays
+      ctx.scale(dpr, dpr);
+      
+      // Set display size via CSS
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      
+      return { width: rect.width, height: rect.height };
     };
-    resize();
-    window.addEventListener('resize', resize);
+    
+    const size = resize();
+    window.addEventListener('resize', () => resize());
 
     // Particle system
     const particles: Array<{
@@ -46,18 +61,17 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
     }> = [];
 
     // Create particles in a grid pattern
-    const spacing = 25;
-    const cols = Math.ceil(canvas.width / spacing);
-    const rows = Math.ceil(canvas.height / spacing);
+    const spacing = 30;
+    const cols = Math.ceil(size.width / spacing);
+    const rows = Math.ceil(size.height / spacing);
     
     for (let i = 0; i < cols; i++) {
       for (let j = 0; j < rows; j++) {
-        if (Math.random() > 0.7) continue; // Skip some for organic feel
+        if (Math.random() > 0.6) continue;
         
         const x = i * spacing + spacing / 2;
         const y = j * spacing + spacing / 2;
         
-        // Vary the hue around blue-purple (220-260)
         const hue = 230 + Math.random() * 40 - 20;
         const lightness = 50 + Math.random() * 30;
         
@@ -69,60 +83,66 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
           vx: 0,
           vy: 0,
           size: 1.5 + Math.random() * 2,
-          color: `hsla(${hue}, 60%, ${lightness}%, 0.4)`,
+          color: `hsla(${hue}, 60%, ${lightness}%, 0.35)`,
         });
       }
     }
 
-    // Track mouse with smoothing
-    let targetX = canvas.width / 2;
-    let targetY = canvas.height / 2;
-    let currentX = targetX;
-    let currentY = targetY;
-
+    // Track mouse relative to viewport (since canvas is fixed)
     const handleMouseMove = (e: MouseEvent) => {
+      // Get canvas position relative to viewport
       const rect = canvas.getBoundingClientRect();
-      targetX = e.clientX - rect.left;
-      targetY = e.clientY - rect.top;
+      
+      // Calculate mouse position in canvas coordinates
+      // This accounts for any CSS scaling or positioning
+      const scaleX = canvas.width / (window.devicePixelRatio || 1) / rect.width;
+      const scaleY = canvas.height / (window.devicePixelRatio || 1) / rect.height;
+      
+      mouseRef.current.x = (e.clientX - rect.left) * scaleX;
+      mouseRef.current.y = (e.clientY - rect.top) * scaleY;
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove);
 
     // Animation loop
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Get CSS pixel dimensions
+      const cssWidth = canvas.width / (window.devicePixelRatio || 1);
+      const cssHeight = canvas.height / (window.devicePixelRatio || 1);
+      
+      ctx.clearRect(0, 0, cssWidth, cssHeight);
 
       // Smooth mouse following
-      currentX += (targetX - currentX) * 0.08;
-      currentY += (targetY - currentY) * 0.08;
+      smoothedMouseRef.current.x += (mouseRef.current.x - smoothedMouseRef.current.x) * 0.1;
+      smoothedMouseRef.current.y += (mouseRef.current.y - smoothedMouseRef.current.y) * 0.1;
+
+      const mx = smoothedMouseRef.current.x;
+      const my = smoothedMouseRef.current.y;
 
       // Update and draw particles
       particles.forEach((p) => {
-        // Calculate distance to mouse
-        const dx = p.x - currentX;
-        const dy = p.y - currentY;
+        const dx = p.x - mx;
+        const dy = p.y - my;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = 120;
+        const maxDist = 100;
 
         // Force field effect
         if (dist < maxDist && dist > 0) {
           const force = (maxDist - dist) / maxDist;
           const angle = Math.atan2(dy, dx);
-          const pushStrength = force * 3;
+          const pushStrength = force * 2.5;
           
           p.vx += Math.cos(angle) * pushStrength;
           p.vy += Math.sin(angle) * pushStrength;
         }
 
         // Apply friction
-        p.vx *= 0.92;
-        p.vy *= 0.92;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
 
-        // Return to origin (spring force)
-        const homeDx = p.originX - p.x;
-        const homeDy = p.originY - p.y;
-        p.vx += homeDx * 0.03;
-        p.vy += homeDy * 0.03;
+        // Return to origin
+        p.vx += (p.originX - p.x) * 0.04;
+        p.vy += (p.originY - p.y) * 0.04;
 
         // Update position
         p.x += p.vx;
@@ -133,20 +153,6 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = p.color;
         ctx.fill();
-
-        // Draw connection to origin (subtle trail)
-        const trailDist = Math.sqrt(
-          Math.pow(p.x - p.originX, 2) + 
-          Math.pow(p.y - p.originY, 2)
-        );
-        if (trailDist > 5) {
-          ctx.beginPath();
-          ctx.moveTo(p.originX, p.originY);
-          ctx.lineTo(p.x, p.y);
-          ctx.strokeStyle = `hsla(230, 60%, 60%, ${0.1 * (trailDist / 50)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
       });
 
       animationRef.current = requestAnimationFrame(animate);
@@ -156,7 +162,7 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
 
     return () => {
       window.removeEventListener('resize', resize);
-      canvas.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationRef.current);
     };
   }, []);
@@ -164,13 +170,13 @@ export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundPro
   return (
     <div 
       ref={containerRef}
-      className={`absolute inset-0 pointer-events-auto overflow-hidden ${className}`}
+      className={`fixed inset-0 pointer-events-none overflow-hidden ${className}`}
       style={{ zIndex: 0 }}
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0.6 }}
+        className="block w-full h-full"
+        style={{ opacity: 0.5 }}
       />
     </div>
   );

@@ -73,21 +73,9 @@ const {
   <link rel="stylesheet" href="/src/styles/globals.css" />
 </head>
 <body class="antialiased relative">
-  <!-- Force Field Background Animation (Client Only) -->
+  <!-- Force Field Background Animation -->
   {showForceField && (
-    <ForceFieldBackground 
-      client:only="react"
-      hue={230}
-      saturation={50}
-      particleOpacity={80}
-      spacing={15}
-      density={1.2}
-      minStroke={1}
-      maxStroke={2.5}
-      magnifierRadius={100}
-      forceStrength={6}
-      className="fixed inset-0"
-    />
+    <ForceFieldBackground client:load />
   )}
   
   <!-- Header/Navigation -->
