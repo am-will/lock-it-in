@@ -134,7 +134,8 @@ export function ProductDetail({ listing, onLock }: ProductDetailProps) {
         {/* Right: Purchase Panel */}
         <div className="lg:col-span-3 space-y-4">
           {/* Main Price Card */}
-          <div className="neo-extrude-lg rounded-2xl p-6 space-y-4 !bg-[#2D3748]">
+          <div className="neo-card p-0 overflow-hidden relative z-20">
+            <div className="p-6 space-y-4">
             <div className="flex items-center gap-2">
               <span className="neo-badge">{listing.gradedStatus === 'graded' ? 'Graded' : 'Raw'}</span>
             </div>
@@ -187,9 +188,10 @@ export function ProductDetail({ listing, onLock }: ProductDetailProps) {
             <div className="text-xs text-secondary text-center">
               Payment processing via Stripe
             </div>
+            </div>
           </div>
 
-          {/* Other Listings */}
+          {/* Other Listings -->
           <div className="neo-card text-center py-4">
             <p className="font-display font-semibold text-primary mb-1">
               View 12 Other Listings
