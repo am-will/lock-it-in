@@ -130,7 +130,6 @@
 .neo-button:hover:not(:disabled) {
   box-shadow: var(--shadow-recess-sm);
   transform: translateY(1px);
-  background: rgba(255, 255, 255, 0.25);
 }
 
 .neo-button:active:not(:disabled),
