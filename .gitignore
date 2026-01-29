@@ -1,6 +1,5 @@
 # build output
 dist/
-# generated types
 .astro/
 
 # dependencies
@@ -12,13 +11,26 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 .env
+.env.local
 .env.production
 
 # macOS-specific files
 .DS_Store
 
-# jetbrains setting folder
+# IDE settings
 .idea/
+.vscode/
+
+# Convex generated files (keep schema, ignore build)
+convex/_generated/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temp files
+*.log
+*.tmp
+.cache/

@@ -1,17 +1,96 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { MarketplaceApp } from '../components/react/MarketplaceApp';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout 
+  title="Lock It In - Premium Trading Card Marketplace"
+  description="Buy, sell, and grade premium trading cards with real-time locking and identity verification."
+>
+  <!-- Hero Section -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-8">
+    <div class="neo-container">
+      <div class="neo-extrude-lg p-6 sm:p-8 lg:p-10 relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 pattern-dots opacity-30"></div>
+        
+        <!-- Gradient Orbs -->
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-400/20 blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-3xl"></div>
+        
+        <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h1 class="font-display font-bold text-2xl sm:text-3xl lg:text-4xl mb-2">
+              <span class="hero-gradient-text">Lock It In.</span>
+              <span class="text-primary"> Trade Cards.</span>
+            </h1>
+            <p class="text-secondary max-w-xl">
+              Find premium trading cards from verified sellers. Lock cards instantly while you complete your purchase.
+            </p>
+          </div>
+          
+          <a 
+            href="/sell" 
+            class="neo-button neo-button-lg shrink-0"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Sell Your Cards
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marketplace Section -->
+  <section class="px-4 sm:px-6 lg:px-8 pb-16">
+    <MarketplaceApp client:load />
+  </section>
+
+  <!-- Features Grid (compact) -->
+  <section class="px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="neo-container">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Feature 1 -->
+        <div class="neo-card text-center py-6">
+          <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+            ⚡
+          </div>
+          <h3 class="font-display font-bold text-base mb-1">Real-Time Locking</h3>
+          <p class="text-xs text-secondary">Lock cards instantly for 10 minutes while you checkout</p>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="neo-card text-center py-6">
+          <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+            🛡️
+          </div>
+          <h3 class="font-display font-bold text-base mb-1">Verified Sellers</h3>
+          <p class="text-xs text-secondary">Every seller is phone and identity verified</p>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="neo-card text-center py-6">
+          <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+            ✓
+          </div>
+          <h3 class="font-display font-bold text-base mb-1">Pro Grading</h3>
+          <p class="text-xs text-secondary">Optional professional grading after purchase</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pattern-dots {
+    background-image: radial-gradient(circle, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .hero-gradient-text {
+    background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+</style>

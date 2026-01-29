@@ -1,0 +1,185 @@
+---
+/**
+ * Lock It In - Base Layout
+ * Neomorphic design system with bold typography
+ */
+
+import { AppProviders } from '../components/react/AppProviders';
+
+interface Props {
+  title?: string;
+  description?: string;
+  wrapWithProviders?: boolean;
+}
+
+const { 
+  title = "Lock It In - Trading Cards",
+  description = "Premium trading card marketplace with real-time locking, identity verification, and grading services.",
+  wrapWithProviders = true
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#E0E5EC" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" href="/favicon.ico" />
+  
+  <!-- Google Fonts Preconnect for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- Generator -->
+  <meta name="generator" content={Astro.generator} />
+  
+  <title>{title}</title>
+  
+  <!-- Critical CSS Inline for faster first paint -->
+  <style is:inline>
+    /* Critical rendering path styles */
+    :root {
+      --color-base: #E0E5EC;
+      --shadow-dark: rgba(163, 177, 198, 0.6);
+      --shadow-light: rgba(255, 255, 255, 0.5);
+    }
+    
+    html {
+      font-family: 'Work Sans', system-ui, sans-serif;
+    }
+    
+    body {
+      background-color: var(--color-base);
+      margin: 0;
+      min-height: 100vh;
+    }
+    
+    /* Prevent FOUC */
+    .no-fouc {
+      visibility: hidden;
+    }
+  </style>
+  
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/src/styles/globals.css" />
+</head>
+<body class="antialiased">
+  <!-- Header/Navigation -->
+  <header class="fixed top-0 left-0 right-0 z-50 pt-4">
+    <div class="neo-container">
+      <nav class="neo-nav flex items-center justify-between">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="neo-extrude-sm w-10 h-10 flex items-center justify-center text-xl">
+          🔒
+        </div>
+        <span class="font-display font-bold text-xl tracking-tight text-gradient">
+          LOCK IT IN
+        </span>
+      </a>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center gap-2">
+        <a href="/" class="neo-nav-item active">Marketplace</a>
+        <a href="/sell" class="neo-nav-item">Sell</a>
+        <a href="/grading" class="neo-nav-item">Grading</a>
+        <a href="/about" class="neo-nav-item">About</a>
+      </div>
+      
+      <!-- Auth Actions -->
+      <div class="flex items-center gap-3">
+        <button class="neo-button neo-button-sm hidden sm:flex">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button class="neo-action neo-action-sm">
+          Sign In
+        </button>
+        
+        <!-- Mobile Menu Button -->
+        <button class="neo-button neo-button-sm md:hidden" aria-label="Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-28 pb-16">
+    {wrapWithProviders ? (
+      <AppProviders client:load>
+        <slot />
+      </AppProviders>
+    ) : (
+      <slot />
+    )}
+  </main>
+
+  <!-- Footer -->
+  <footer class="px-4 sm:px-6 lg:px-8 pb-8">
+    <div class="neo-container">
+      <div class="neo-extrude-lg p-8 sm:p-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Brand -->
+          <div class="md:col-span-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="neo-extrude-sm w-10 h-10 flex items-center justify-center text-xl">
+                🔒
+              </div>
+              <span class="font-display font-bold text-xl text-gradient">
+                LOCK IT IN
+              </span>
+            </div>
+            <p class="text-secondary max-w-sm text-sm leading-relaxed">
+              The premier trading card marketplace with real-time locking, 
+              identity verification, and professional grading services.
+            </p>
+          </div>
+          
+          <!-- Quick Links -->
+          <div>
+            <h4 class="font-display font-semibold text-sm uppercase tracking-wider mb-4">
+              Platform
+            </h4>
+            <ul class="space-y-2 text-sm text-secondary">
+              <li><a href="/" class="hover:text-primary transition-colors">Marketplace</a></li>
+              <li><a href="/sell" class="hover:text-primary transition-colors">Sell Cards</a></li>
+              <li><a href="/grading" class="hover:text-primary transition-colors">Grading</a></li>
+              <li><a href="/pricing" class="hover:text-primary transition-colors">Pricing</a></li>
+            </ul>
+          </div>
+          
+          <!-- Support -->
+          <div>
+            <h4 class="font-display font-semibold text-sm uppercase tracking-wider mb-4">
+              Support
+            </h4>
+            <ul class="space-y-2 text-sm text-secondary">
+              <li><a href="/help" class="hover:text-primary transition-colors">Help Center</a></li>
+              <li><a href="/safety" class="hover:text-primary transition-colors">Safety</a></li>
+              <li><a href="/terms" class="hover:text-primary transition-colors">Terms</a></li>
+              <li><a href="/privacy" class="hover:text-primary transition-colors">Privacy</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="neo-divider mt-8 mb-6"></div>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-muted">
+          <p>&copy; {new Date().getFullYear()} Lock It In. All rights reserved.</p>
+          <div class="flex items-center gap-4">
+            <a href="#" class="hover:text-primary transition-colors">Twitter</a>
+            <a href="#" class="hover:text-primary transition-colors">Discord</a>
+            <a href="#" class="hover:text-primary transition-colors">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,267 @@
+---
+/**
+ * Identity Verification Pending Page
+ * 
+ * Shown during verification processing after user completes Stripe Identity flow.
+ * Provides auto-refresh and manual status checking options.
+ */
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Auto-refresh interval in seconds (set to 0 to disable)
+const AUTO_REFRESH_SECONDS = 5;
+---
+
+<BaseLayout 
+  title="Verification Processing | Lock It In" 
+  description="Your identity verification is being processed"
+>
+  <div class="neo-container py-12 sm:py-20">
+    <div class="max-w-xl mx-auto">
+      {/* Processing Card */}
+      <div class="neo-extrude-lg p-8 sm:p-12 text-center">
+        {/* Animated Processing Icon */}
+        <div class="relative w-24 h-24 mx-auto mb-8">
+          {/* Outer ring */}
+          <div class="absolute inset-0 neo-extrude-xl rounded-full" />
+          {/* Inner spinning element */}
+          <div class="absolute inset-2 neo-recess rounded-full flex items-center justify-center">
+            <span class="text-3xl">⏳</span>
+          </div>
+          {/* Pulse animation ring */}
+          <div 
+            class="absolute inset-0 rounded-full animate-ping opacity-20"
+            style={{ background: "var(--gradient-action)" }}
+          />
+        </div>
+
+        {/* Title */}
+        <h1 
+          class="text-2xl sm:text-3xl font-bold mb-4"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          Verification in Progress
+        </h1>
+
+        {/* Description */}
+        <p 
+          class="text-gray-600 mb-8 leading-relaxed"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Your identity documents have been submitted and are being reviewed. 
+          This typically takes <strong>1-2 minutes</strong>, but can take up to 5 minutes during busy periods.
+        </p>
+
+        {/* Progress Indicator */}
+        <div class="neo-recess-sm p-1 rounded-full mb-8 overflow-hidden">
+          <div 
+            class="h-2 rounded-full transition-all duration-1000"
+            style={{ 
+              background: "var(--gradient-action)",
+              width: "60%",
+              animation: "progressPulse 2s ease-in-out infinite"
+            }}
+          />
+        </div>
+
+        {/* Status Steps */}
+        <div class="space-y-3 mb-8 text-left">
+          {[
+            { icon: "✓", text: "Documents submitted", complete: true },
+            { icon: "✓", text: "Processing verification", complete: true },
+            { icon: "⏳", text: "Reviewing identity", complete: false, active: true },
+            { icon: "○", text: "Verification complete", complete: false },
+          ].map((step, index) => (
+            <div 
+              key={index}
+              class={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                step.active 
+                  ? "neo-extrude-sm" 
+                  : step.complete 
+                    ? "" 
+                    : "opacity-50"
+              }`}
+            >
+              <div 
+                class={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  step.complete 
+                    ? "bg-green-100 text-green-600" 
+                    : step.active 
+                      ? "neo-extrude text-indigo-600" 
+                      : "neo-recess-sm text-gray-400"
+                }`}
+              >
+                <span class="text-sm font-bold">{step.icon}</span>
+              </div>
+              <span 
+                class={`${step.complete || step.active ? "text-gray-700" : "text-gray-400"}`}
+                style={{ fontFamily: "var(--font-body)" }}
+              >
+                {step.text}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div class="space-y-3">
+          <button
+            id="checkStatusBtn"
+            class="neo-action w-full"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            <span class="flex items-center justify-center gap-2">
+              <svg 
+                id="refreshIcon"
+                xmlns="http://www.w3.org/2000/svg" 
+                width="18" 
+                height="18" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                stroke-width="2" 
+                stroke-linecap="round" 
+                stroke-linejoin="round"
+                class="transition-transform"
+              >
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                <path d="M16 16h5v5"/>
+              </svg>
+              Check Status Now
+            </span>
+          </button>
+
+          <a
+            href="/"
+            class="neo-button w-full text-center block"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            Browse Marketplace
+          </a>
+        </div>
+
+        {/* Auto-refresh indicator */}
+        <p 
+          id="refreshStatus"
+          class="text-xs text-gray-400 mt-6"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Auto-refreshing in <span id="countdown">{AUTO_REFRESH_SECONDS}</span>s
+        </p>
+      </div>
+
+      {/* Info Box */}
+      <div class="neo-recess-sm p-6 rounded-2xl mt-6">
+        <h3 
+          class="font-bold mb-3 flex items-center gap-2"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          <span>💡</span>
+          What happens next?
+        </h3>
+        <ul 
+          class="text-sm text-gray-600 space-y-2"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-500 mt-0.5">•</span>
+            <span>We&apos;ll notify you as soon as your verification is complete</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span class="text-indigo-500 mt-0.5">•</span>
+            <span>You can browse the marketplace while you wait</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span class="text-indigo-500 mt-0.5">•</span>
+            <span>Once verified, you&apos;ll be able to buy, sell, and lock cards</span>
+          </li>
+        </ul>
+      </div>
+
+      {/* Support Link */}
+      <div class="text-center mt-8">
+        <p 
+          class="text-sm text-gray-500 mb-2"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Taking longer than expected?
+        </p>
+        <a 
+          href="/help" 
+          class="text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Contact Support
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {/* Auto-refresh Script */}
+  <script define:vars={{ AUTO_REFRESH_SECONDS }}>
+    let countdown = AUTO_REFRESH_SECONDS;
+    const countdownEl = document.getElementById('countdown');
+    const refreshStatusEl = document.getElementById('refreshStatus');
+    const checkStatusBtn = document.getElementById('checkStatusBtn');
+    const refreshIcon = document.getElementById('refreshIcon');
+
+    // Countdown timer
+    const timer = setInterval(() => {
+      countdown--;
+      if (countdownEl) {
+        countdownEl.textContent = countdown;
+      }
+
+      if (countdown <= 0) {
+        clearInterval(timer);
+        if (refreshStatusEl) {
+          refreshStatusEl.innerHTML = '<span class="neo-loading inline-block w-4 h-4 rounded-full mr-2"></span>Refreshing...';
+        }
+        // Reload to check status
+        window.location.reload();
+      }
+    }, 1000);
+
+    // Manual check status button
+    if (checkStatusBtn) {
+      checkStatusBtn.addEventListener('click', () => {
+        // Stop auto-refresh
+        clearInterval(timer);
+        
+        // Show loading state
+        checkStatusBtn.disabled = true;
+        checkStatusBtn.innerHTML = '<span class="neo-loading inline-block w-5 h-5 rounded-full mr-2"></span>Checking...';
+        
+        if (refreshIcon) {
+          refreshIcon.style.transform = 'rotate(360deg)';
+          refreshIcon.style.transition = 'transform 0.5s ease';
+        }
+        
+        if (refreshStatusEl) {
+          refreshStatusEl.textContent = 'Checking your verification status...';
+        }
+        
+        // Redirect to verify page to check actual status
+        window.location.href = '/identity/verify';
+      });
+    }
+  </script>
+
+  <style>
+    @keyframes progressPulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    /* Ensure the page doesn't flicker during auto-refresh */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</BaseLayout>

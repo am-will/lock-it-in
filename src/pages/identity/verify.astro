@@ -1,0 +1,186 @@
+---
+/**
+ * Identity Verification Page
+ * 
+ * Hosts the IdentityVerificationPanel component and handles
+ * redirects back from Stripe Identity verification flow.
+ */
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { ClientOnlyIdentityPanel } from "../../components/react/ClientOnlyIdentityPanel";
+
+// Get URL parameters for verification result handling
+const url = new URL(Astro.request.url);
+const status = url.searchParams.get("status");
+const error = url.searchParams.get("error");
+const errorDescription = url.searchParams.get("error_description");
+
+// Determine page title based on state
+let pageTitle = "Identity Verification";
+let pageDescription = "Verify your identity to unlock all marketplace features";
+
+if (status === "success") {
+  pageTitle = "Identity Verified | Lock It In";
+  pageDescription = "Your identity has been successfully verified";
+} else if (status === "failed" || error) {
+  pageTitle = "Verification Failed | Lock It In";
+  pageDescription = "There was an issue with your identity verification";
+}
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <div class="neo-container py-8 sm:py-12">
+    {/* Back Link */}
+    <div class="mb-6">
+      <a 
+        href="/" 
+        class="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        style={{ fontFamily: "var(--font-body)" }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Back to Marketplace
+      </a>
+    </div>
+
+    {/* Page Header */}
+    <div class="text-center mb-8">
+      <h1 
+        class="text-3xl sm:text-4xl font-bold mb-3"
+        style={{ fontFamily: "var(--font-display)" }}
+      >
+        {status === "success" ? (
+          <span>🎉 Verification Complete</span>
+        ) : status === "failed" || error ? (
+          <span>⚠️ Verification Issue</span>
+        ) : (
+          <span>🔐 Identity Verification</span>
+        )}
+      </h1>
+      <p 
+        class="text-gray-600 max-w-lg mx-auto"
+        style={{ fontFamily: "var(--font-body)" }}
+      >
+        {status === "success" 
+          ? "Your identity has been successfully verified. You now have full access to all marketplace features."
+          : status === "failed" || error
+          ? "There was an issue with your verification. Please review the details below and try again."
+          : "Complete identity verification to unlock buying, selling, and trading features. US residents only."
+        }
+      </p>
+    </div>
+
+    {/* URL Parameter Alerts */}
+    {status === "success" && (
+      <div class="max-w-2xl mx-auto mb-6">
+        <div 
+          class="neo-extrude p-4 rounded-xl flex items-center gap-4"
+          style={{ 
+            background: "linear-gradient(135deg, #10B98120 0%, #05966920 100%)",
+            border: "1px solid #10B98140"
+          }}
+        >
+          <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-2xl">✓</span>
+          </div>
+          <div>
+            <h3 
+              class="font-bold text-green-800"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Verification Submitted
+            </h3>
+            <p 
+              class="text-sm text-green-700"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              Your documents have been received and are being processed. This usually takes a few minutes.
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {(status === "failed" || error) && (
+      <div class="max-w-2xl mx-auto mb-6">
+        <div 
+          class="neo-extrude p-4 rounded-xl flex items-center gap-4"
+          style={{ 
+            background: "linear-gradient(135deg, #EF444420 0%, #DC262620 100%)",
+            border: "1px solid #EF444440"
+          }}
+        >
+          <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-2xl">⚠️</span>
+          </div>
+          <div>
+            <h3 
+              class="font-bold text-red-800"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              Verification Failed
+            </h3>
+            <p 
+              class="text-sm text-red-700"
+              style={{ fontFamily: "var(--font-body)" }}
+            >
+              {errorDescription || "Your identity could not be verified. Please review the requirements and try again."}
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Main Verification Panel - Client Only to prevent SSR auth issues */}
+    <ClientOnlyIdentityPanel client:only="react" />
+
+    {/* Help Section */}
+    <div class="max-w-2xl mx-auto mt-12 text-center">
+      <div class="neo-recess-sm p-6 rounded-2xl">
+        <h3 
+          class="font-bold mb-3 flex items-center justify-center gap-2"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          <span>❓</span>
+          Need Help?
+        </h3>
+        <p 
+          class="text-sm text-gray-600 mb-4"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          If you&apos;re having trouble with identity verification, our support team is here to help.
+        </p>
+        <a 
+          href="/help" 
+          class="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors"
+          style={{ fontFamily: "var(--font-body)" }}
+        >
+          Visit Help Center
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Custom animations for status transitions */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-enter {
+    animation: slideDown 0.3s ease-out;
+  }
+</style>
