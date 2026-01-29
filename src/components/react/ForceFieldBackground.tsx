@@ -1,391 +1,177 @@
 /**
  * ForceFieldBackground.tsx
  * 
- * An interactive, particle-based background that reacts to mouse movement.
- * Adapted for the Lock It In neomorphic design theme.
- * 
- * Uses p5.js for high-performance canvas rendering with a magnetic "force field" effect.
+ * Interactive particle background using p5.js
+ * Adapted for neomorphic design with subtle blue-purple particles
  */
 
-import React, { useEffect, useRef, useState } from 'react';
-import p5 from 'p5';
+import React, { useEffect, useRef } from 'react';
 
-export interface ForceFieldBackgroundProps {
-  /**
-   * URL of the image to use as the base for the particle field
-   * @default "https://cdn.pixabay.com/photo/2024/12/13/20/29/alps-9266131_1280.jpg"
-   */
-  imageUrl?: string;
-  /**
-   * Base hue for the color palette (0-360)
-   * @default 220 (blue-purple for our theme)
-   */
-  hue?: number;
-  /**
-   * Color saturation (0-100)
-   * @default 70
-   */
-  saturation?: number;
-  /**
-   * Brightness threshold for particle visibility (0-255)
-   * @default 255
-   */
-  threshold?: number;
-  /**
-   * Minimum stroke weight for particles
-   * @default 1
-   */
-  minStroke?: number;
-  /**
-   * Maximum stroke weight for particles
-   * @default 3
-   */
-  maxStroke?: number;
-  /**
-   * Spacing between particles (lower = more density)
-   * @default 12
-   */
-  spacing?: number;
-  /**
-   * Noise scale for particle placement irregularity
-   * @default 0
-   */
-  noiseScale?: number;
-  /**
-   * Density factor (probability of particle existence)
-   * @default 1.5
-   */
-  density?: number;
-  /**
-   * Invert the source image brightness mapping
-   * @default true
-   */
-  invertImage?: boolean;
-  /**
-   * Invert the wireframe/particle visibility condition
-   * @default true
-   */
-  invertWireframe?: boolean;
-  /**
-   * Enable the magnifier/force field effect
-   * @default true
-   */
-  magnifierEnabled?: boolean;
-  /**
-   * Radius of the force field effect around the cursor
-   * @default 120
-   */
-  magnifierRadius?: number;
-  /**
-   * Strength of the force pushing particles away
-   * @default 8
-   */
-  forceStrength?: number;
-  /**
-   * Friction factor for particle movement (0-1)
-   * @default 0.92
-   */
-  friction?: number;
-  /**
-   * Speed at which particles return to original position
-   * @default 0.04
-   */
-  restoreSpeed?: number;
-  /**
-   * Opacity of particles (0-255)
-   * @default 100
-   */
-  particleOpacity?: number;
-  /**
-   * Additional CSS class names
-   */
+interface ForceFieldBackgroundProps {
   className?: string;
 }
 
-/**
- * ForceFieldBackground
- * 
- * An interactive, particle-based background that reacts to mouse movement.
- * Adapted for light neomorphic themes with subtle blue-purple particles.
- */
-export function ForceFieldBackground({
-  imageUrl = "https://cdn.pixabay.com/photo/2024/12/13/20/29/alps-9266131_1280.jpg",
-  hue = 230,
-  saturation = 60,
-  threshold = 255,
-  minStroke = 1,
-  maxStroke = 3,
-  spacing = 12,
-  noiseScale = 0,
-  density = 1.5,
-  invertImage = true,
-  invertWireframe = true,
-  magnifierEnabled = true,
-  magnifierRadius = 120,
-  forceStrength = 8,
-  friction = 0.92,
-  restoreSpeed = 0.04,
-  particleOpacity = 120,
-  className = "",
-}: ForceFieldBackgroundProps) {
+export function ForceFieldBackground({ className = '' }: ForceFieldBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const p5InstanceRef = useRef<p5 | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Keep latest props in ref to access inside p5 closure without re-instantiating
-  const propsRef = useRef({
-    hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale, 
-    density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius,
-    forceStrength, friction, restoreSpeed, particleOpacity
-  });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
+  const mouseRef = useRef({ x: 0, y: 0, vx: 0, vy: 0 });
 
   useEffect(() => {
-    propsRef.current = {
-      hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale,
-      density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius,
-      forceStrength, friction, restoreSpeed, particleOpacity
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    const resize = () => {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
     };
-  }, [hue, saturation, threshold, minStroke, maxStroke, spacing, noiseScale, density, invertImage, invertWireframe, magnifierEnabled, magnifierRadius, forceStrength, friction, restoreSpeed, particleOpacity]);
+    resize();
+    window.addEventListener('resize', resize);
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+    // Particle system
+    const particles: Array<{
+      x: number;
+      y: number;
+      originX: number;
+      originY: number;
+      vx: number;
+      vy: number;
+      size: number;
+      color: string;
+    }> = [];
 
-    // Cleanup previous instance if exists
-    if (p5InstanceRef.current) {
-      p5InstanceRef.current.remove();
+    // Create particles in a grid pattern
+    const spacing = 25;
+    const cols = Math.ceil(canvas.width / spacing);
+    const rows = Math.ceil(canvas.height / spacing);
+    
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        if (Math.random() > 0.7) continue; // Skip some for organic feel
+        
+        const x = i * spacing + spacing / 2;
+        const y = j * spacing + spacing / 2;
+        
+        // Vary the hue around blue-purple (220-260)
+        const hue = 230 + Math.random() * 40 - 20;
+        const lightness = 50 + Math.random() * 30;
+        
+        particles.push({
+          x,
+          y,
+          originX: x,
+          originY: y,
+          vx: 0,
+          vy: 0,
+          size: 1.5 + Math.random() * 2,
+          color: `hsla(${hue}, 60%, ${lightness}%, 0.4)`,
+        });
+      }
     }
 
-    const sketch = (p: p5) => {
-      let originalImg: p5.Image;
-      let img: p5.Image;
-      let palette: p5.Color[] = [];
-      let points: {
-        pos: p5.Vector;
-        originalPos: p5.Vector;
-        vel: p5.Vector;
-      }[] = [];
-      
-      // Internal state tracking to detect changes
-      let lastHue = -1;
-      let lastSaturation = -1;
-      let lastSpacing = -1;
-      let lastNoiseScale = -1;
-      let lastDensity = -1;
-      let lastInvertImage: boolean | null = null;
-      let magnifierX = 0;
-      let magnifierY = 0;
-      let magnifierInertia = 0.08;
+    // Track mouse with smoothing
+    let targetX = canvas.width / 2;
+    let targetY = canvas.height / 2;
+    let currentX = targetX;
+    let currentY = targetY;
 
-      p.preload = () => {
-        p.loadImage(
-          imageUrl,
-          (loadedImg) => {
-            originalImg = loadedImg;
-            setIsLoading(false);
-          },
-          () => {
-            setError("Failed to load image");
-            setIsLoading(false);
-          }
-        );
-      };
-
-      p.setup = () => {
-        if (!originalImg) return;
-        
-        const { clientWidth, clientHeight } = containerRef.current!;
-        p.createCanvas(clientWidth, clientHeight);
-        
-        magnifierX = p.width / 2;
-        magnifierY = p.height / 2;
-
-        processImage();
-        generatePalette(propsRef.current.hue, propsRef.current.saturation);
-        generatePoints();
-      };
-
-      p.windowResized = () => {
-        if (!containerRef.current || !originalImg) return;
-        const { clientWidth, clientHeight } = containerRef.current;
-        p.resizeCanvas(clientWidth, clientHeight);
-        processImage();
-        generatePoints();
-      };
-
-      function processImage() {
-        if (!originalImg) return;
-        img = originalImg.get();
-        if (p.width > 0 && p.height > 0) {
-          img.resize(p.width, p.height);
-        }
-        img.filter(p.GRAY);
-
-        if (propsRef.current.invertImage) {
-          img.loadPixels();
-          for (let i = 0; i < img.pixels.length; i += 4) {
-            img.pixels[i] = 255 - img.pixels[i];
-            img.pixels[i + 1] = 255 - img.pixels[i + 1];
-            img.pixels[i + 2] = 255 - img.pixels[i + 2];
-          }
-          img.updatePixels();
-        }
-        lastInvertImage = propsRef.current.invertImage;
-      }
-
-      function generatePalette(h: number, s: number) {
-        palette = [];
-        p.push();
-        p.colorMode(p.HSL);
-        const alpha = propsRef.current.particleOpacity;
-        for (let i = 0; i < 8; i++) {
-          let lightness = p.map(i, 0, 7, 85, 40);
-          const c = p.color(h, s, lightness);
-          c.setAlpha(alpha);
-          palette.push(c);
-        }
-        p.pop();
-      }
-
-      function generatePoints() {
-        if (!img) return;
-        points = [];
-        const { spacing, density, noiseScale } = propsRef.current;
-        
-        const safeSpacing = Math.max(4, spacing);
-
-        for (let y = 0; y < img.height; y += safeSpacing) {
-          for (let x = 0; x < img.width; x += safeSpacing) {
-            if (p.random() > density) continue;
-            
-            let nx = p.noise(x * noiseScale, y * noiseScale) - 0.5;
-            let ny = p.noise((x + 500) * noiseScale, (y + 500) * noiseScale) - 0.5;
-            let px = x + nx * safeSpacing;
-            let py = y + ny * safeSpacing;
-            
-            points.push({
-              pos: p.createVector(px, py),
-              originalPos: p.createVector(px, py),
-              vel: p.createVector(0, 0)
-            });
-          }
-        }
-        
-        lastSpacing = spacing;
-        lastNoiseScale = noiseScale;
-        lastDensity = density;
-      }
-
-      function applyForceField(mx: number, my: number) {
-        const props = propsRef.current;
-        if (!props.magnifierEnabled) return;
-
-        for (let pt of points) {
-          let dir = p5.Vector.sub(pt.pos, p.createVector(mx, my));
-          let d = dir.mag();
-          
-          if (d < props.magnifierRadius) {
-            dir.normalize();
-            let force = dir.mult(props.forceStrength / Math.max(1, d));
-            pt.vel.add(force);
-          }
-          
-          pt.vel.mult(props.friction);
-          
-          let restore = p5.Vector.sub(pt.pos, pt.originalPos).mult(-props.restoreSpeed);
-          pt.vel.add(restore);
-          
-          pt.pos.add(pt.vel);
-        }
-      }
-
-      p.draw = () => {
-        if (!img) return;
-        
-        // Clear with transparent background to show underlying neomorphic design
-        p.clear();
-
-        const props = propsRef.current;
-
-        if (props.hue !== lastHue || props.saturation !== lastSaturation) {
-          generatePalette(props.hue, props.saturation);
-          lastHue = props.hue;
-          lastSaturation = props.saturation;
-        }
-
-        if (props.invertImage !== lastInvertImage) {
-          processImage();
-        }
-
-        if (props.spacing !== lastSpacing || props.noiseScale !== lastNoiseScale || props.density !== lastDensity) {
-          generatePoints();
-        }
-
-        magnifierX = p.lerp(magnifierX, p.mouseX, magnifierInertia);
-        magnifierY = p.lerp(magnifierY, p.mouseY, magnifierInertia);
-
-        applyForceField(magnifierX, magnifierY);
-
-        img.loadPixels();
-        p.noFill();
-
-        for (let pt of points) {
-          let x = pt.pos.x;
-          let y = pt.pos.y;
-          let d = p.dist(x, y, magnifierX, magnifierY);
-          
-          let px = p.constrain(p.floor(x), 0, img.width - 1);
-          let py = p.constrain(p.floor(y), 0, img.height - 1);
-          
-          let index = (px + py * img.width) * 4;
-          let brightness = img.pixels[index];
-
-          if (brightness === undefined) continue;
-
-          let condition = props.invertWireframe
-            ? brightness < props.threshold
-            : brightness > props.threshold;
-
-          if (condition) {
-            let shadeIndex = Math.floor(p.map(brightness, 0, 255, 0, palette.length - 1));
-            shadeIndex = p.constrain(shadeIndex, 0, palette.length - 1);
-            
-            let strokeSize = p.map(brightness, 0, 255, props.minStroke, props.maxStroke);
-            
-            if (props.magnifierEnabled && d < props.magnifierRadius) {
-              let factor = p.map(d, 0, props.magnifierRadius, 1.5, 1);
-              strokeSize *= factor;
-            }
-            
-            if (palette[shadeIndex]) {
-              p.stroke(palette[shadeIndex]);
-              p.strokeWeight(strokeSize);
-              p.point(x, y);
-            }
-          }
-        }
-      };
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      targetX = e.clientX - rect.left;
+      targetY = e.clientY - rect.top;
     };
 
-    const myP5 = new p5(sketch, containerRef.current);
-    p5InstanceRef.current = myP5;
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    // Animation loop
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Smooth mouse following
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+
+      // Update and draw particles
+      particles.forEach((p) => {
+        // Calculate distance to mouse
+        const dx = p.x - currentX;
+        const dy = p.y - currentY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = 120;
+
+        // Force field effect
+        if (dist < maxDist && dist > 0) {
+          const force = (maxDist - dist) / maxDist;
+          const angle = Math.atan2(dy, dx);
+          const pushStrength = force * 3;
+          
+          p.vx += Math.cos(angle) * pushStrength;
+          p.vy += Math.sin(angle) * pushStrength;
+        }
+
+        // Apply friction
+        p.vx *= 0.92;
+        p.vy *= 0.92;
+
+        // Return to origin (spring force)
+        const homeDx = p.originX - p.x;
+        const homeDy = p.originY - p.y;
+        p.vx += homeDx * 0.03;
+        p.vy += homeDy * 0.03;
+
+        // Update position
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        // Draw connection to origin (subtle trail)
+        const trailDist = Math.sqrt(
+          Math.pow(p.x - p.originX, 2) + 
+          Math.pow(p.y - p.originY, 2)
+        );
+        if (trailDist > 5) {
+          ctx.beginPath();
+          ctx.moveTo(p.originX, p.originY);
+          ctx.lineTo(p.x, p.y);
+          ctx.strokeStyle = `hsla(230, 60%, 60%, ${0.1 * (trailDist / 50)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
 
     return () => {
-      myP5.remove();
+      window.removeEventListener('resize', resize);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationRef.current);
     };
-  }, [imageUrl]);
+  }, []);
 
   return (
     <div 
-      className={`absolute inset-0 pointer-events-none ${className}`} 
       ref={containerRef}
+      className={`absolute inset-0 pointer-events-auto overflow-hidden ${className}`}
       style={{ zIndex: 0 }}
     >
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center text-secondary/30 text-xs tracking-widest uppercase">
-          Loading...
-        </div>
-      )}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{ opacity: 0.6 }}
+      />
     </div>
   );
 }
