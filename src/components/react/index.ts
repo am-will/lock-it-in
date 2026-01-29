@@ -8,6 +8,7 @@
 export { AppProviders } from "./AppProviders";
 export { ClerkProviderWrapper } from "./ClerkProviderWrapper";
 export { ClientOnlyMarketplace } from "./ClientOnlyMarketplace";
+export { ForceFieldBackground } from "./ForceFieldBackground";
 
 // Auth Components
 export { PhoneVerificationFlow } from "./PhoneVerificationFlow";

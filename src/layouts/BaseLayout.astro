@@ -2,20 +2,24 @@
 /**
  * Lock It In - Base Layout
  * Neomorphic design system with bold typography
+ * Includes ForceFieldBackground for interactive particle animation
  */
 
 import { AppProviders } from '../components/react/AppProviders';
+import { ForceFieldBackground } from '../components/react/ForceFieldBackground';
 
 interface Props {
   title?: string;
   description?: string;
   wrapWithProviders?: boolean;
+  showForceField?: boolean;
 }
 
 const { 
   title = "Lock It In - Trading Cards",
   description = "Premium trading card marketplace with real-time locking, identity verification, and grading services.",
-  wrapWithProviders = true
+  wrapWithProviders = true,
+  showForceField = true
 } = Astro.props;
 ---
 
@@ -68,7 +72,24 @@ const {
   <!-- Global Styles -->
   <link rel="stylesheet" href="/src/styles/globals.css" />
 </head>
-<body class="antialiased">
+<body class="antialiased relative">
+  <!-- Force Field Background Animation (Client Only) -->
+  {showForceField && (
+    <ForceFieldBackground 
+      client:only="react"
+      hue={230}
+      saturation={50}
+      particleOpacity={80}
+      spacing={15}
+      density={1.2}
+      minStroke={1}
+      maxStroke={2.5}
+      magnifierRadius={100}
+      forceStrength={6}
+      className="fixed inset-0"
+    />
+  )}
+  
   <!-- Header/Navigation -->
   <header class="fixed top-0 left-0 right-0 z-50 pt-4">
     <div class="neo-container">
