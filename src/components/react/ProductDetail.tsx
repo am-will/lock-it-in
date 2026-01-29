@@ -134,7 +134,7 @@ export function ProductDetail({ listing, onLock }: ProductDetailProps) {
         {/* Right: Purchase Panel */}
         <div className="lg:col-span-3 space-y-4">
           {/* Main Price Card */}
-          <div className="neo-extrude-lg rounded-2xl p-6 space-y-4 bg-[#2D3748]">
+          <div className="neo-extrude-lg rounded-2xl p-6 space-y-4 !bg-[#2D3748]">
             <div className="flex items-center gap-2">
               <span className="neo-badge">{listing.gradedStatus === 'graded' ? 'Graded' : 'Raw'}</span>
             </div>
