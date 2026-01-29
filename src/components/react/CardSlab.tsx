@@ -11,14 +11,7 @@ import type { CardSlabProps } from "../../types/marketplace";
 import { LockButton } from "./LockButton";
 import { ListingMeta } from "./ListingMeta";
 import { getCategoryById, getCategoryGroupName } from "../../data/categories";
-import { getStateCode } from "../../data/locations";
-
-/**
- * Format price from cents to dollars
- */
-function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
-}
+import { formatPrice } from "../../utils/format";
 
 /**
  * Get gradient based on category group for image placeholder
@@ -97,9 +90,10 @@ export function CardSlab({ listing, onLock, isLocking }: CardSlabProps) {
   const isAvailable = listing.status === "available";
 
   return (
-    <div 
+    <a 
+      href={`/product/${listing._id}`}
       className={`
-        neo-card group
+        neo-card group block
         ${isLocked ? "neo-card-locked" : ""}
       `}
     >
@@ -177,16 +171,24 @@ export function CardSlab({ listing, onLock, isLocking }: CardSlabProps) {
             {formatPrice(listing.priceCents)}
           </span>
           
-          <LockButton
-            status={listing.status}
-            lockExpiresAt={listing.lockExpiresAt}
-            onClick={() => onLock?.(listing._id)}
-            isLoading={isLocking}
-            disabled={!isAvailable}
-          />
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onLock?.(listing._id);
+            }}
+            disabled={!isAvailable || isLocking}
+            className="neo-action neo-action-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="inline-block mr-1">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Lock It In
+          </button>
         </div>
       </div>
-    </div>
+    </a>
   );
 }
 

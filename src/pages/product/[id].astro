@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ProductDetail } from '../../components/react/ProductDetail';
+import { mockListings } from '../../data/mockListings';
+
+// Generate static paths for all mock listings
+export function getStaticPaths() {
+  return mockListings.map(listing => ({
+    params: { id: listing._id },
+    props: { listing },
+  }));
+}
+
+// Get the listing from props
+const { listing } = Astro.props;
+
+// SEO metadata
+const title = `${listing.title} - Lock It In`;
+const description = `Buy ${listing.title} from verified sellers. ${listing.gradedStatus === 'graded' ? `Graded ${listing.gradeCompany} ${listing.gradeValue}.` : 'Raw condition.'} Secure trading card marketplace with real-time locking.`;
+---
+
+<BaseLayout title={title} description={description}>
+  <ProductDetail 
+    client:load
+    listing={listing}
+  />
+</BaseLayout>

@@ -30,3 +30,4 @@ export { CheckoutPanel } from "./CheckoutPanel";
 // Grading Components
 export { GradingToggle } from "./GradingToggle";
 export { GradingPanel } from "./GradingPanel";
+export { ProductDetail } from "./ProductDetail";
