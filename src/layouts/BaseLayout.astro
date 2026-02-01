@@ -21,6 +21,15 @@ const {
   wrapWithProviders = true,
   showForceField = true
 } = Astro.props;
+
+// Navigation items for active state
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const navItems = [
+  { href: '/', label: 'Marketplace' },
+  { href: '/sell', label: 'Sell' },
+  { href: '/grading', label: 'Grading' },
+  { href: '/about', label: 'About' },
+];
 ---
 
 <!DOCTYPE html>
@@ -94,10 +103,14 @@ const {
       
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center gap-2">
-        <a href="/" class="neo-nav-item active">Marketplace</a>
-        <a href="/sell" class="neo-nav-item">Sell</a>
-        <a href="/grading" class="neo-nav-item">Grading</a>
-        <a href="/about" class="neo-nav-item">About</a>
+        {navItems.map(item => (
+          <a 
+            href={item.href} 
+            class={`neo-nav-item ${currentPath === item.href ? 'active' : ''}`}
+          >
+            {item.label}
+          </a>
+        ))}
       </div>
       
       <!-- Auth Actions -->
@@ -109,10 +122,7 @@ const {
           Sign In
         </button>
         
-        <!-- Mobile Menu Button -->
-        <button class="neo-button neo-button-sm md:hidden" aria-label="Menu">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
+        <!-- Mobile Menu Button - removed until menu is implemented -->
       </div>
       </nav>
     </div>
@@ -159,7 +169,6 @@ const {
               <li><a href="/" class="hover:text-primary transition-colors">Marketplace</a></li>
               <li><a href="/sell" class="hover:text-primary transition-colors">Sell Cards</a></li>
               <li><a href="/grading" class="hover:text-primary transition-colors">Grading</a></li>
-              <li><a href="/pricing" class="hover:text-primary transition-colors">Pricing</a></li>
             </ul>
           </div>
           
@@ -169,10 +178,9 @@ const {
               Support
             </h4>
             <ul class="space-y-2 text-sm text-secondary">
-              <li><a href="/help" class="hover:text-primary transition-colors">Help Center</a></li>
-              <li><a href="/safety" class="hover:text-primary transition-colors">Safety</a></li>
-              <li><a href="/terms" class="hover:text-primary transition-colors">Terms</a></li>
-              <li><a href="/privacy" class="hover:text-primary transition-colors">Privacy</a></li>
+              <li><a href="/about" class="hover:text-primary transition-colors">About Us</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors">Terms</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors">Privacy</a></li>
             </ul>
           </div>
         </div>

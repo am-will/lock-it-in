@@ -68,9 +68,9 @@ T1 (Fix Config) ──┬── T2 (Verify About Page) ──┐
   ```
   Also verify the `.neo-nav-item.active` CSS class exists and renders correctly.
 - **validation**: When on /about, the "About" nav item shows the active (pressed/highlighted) state
-- **status**: Not Completed
-- **log**: 
-- **files edited/created**: 
+- **status**: Completed
+- **log**: Fixed trailing slash path comparison in BaseLayout.astro. Changed `const currentPath = Astro.url.pathname;` to `const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';` to normalize paths. Verified `.neo-nav-item.active` CSS class exists in neomorph.css (lines 361-365) with proper pressed/highlighted styling. Build completed successfully.
+- **files edited/created**: src/layouts/BaseLayout.astro 
 
 ### T4: Final Build Verification
 - **depends_on**: [T2, T3]
