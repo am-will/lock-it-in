@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PageHero } from '../components/react/PageHero';
+import { FAQAccordion } from '../components/react/FAQAccordion';
+import { SELLER_BENEFITS, SELLER_PROCESS, SELLER_FAQS } from '../data/sell';
+---
+
+<BaseLayout 
+  title="Sell Your Cards - Lock It In"
+  description="Sell your trading cards with 0% fees. Reach verified buyers with our secure marketplace."
+>
+  <!-- Hero -->
+  <PageHero 
+    client:load
+    title="Sell Your Cards"
+    subtitle="List your trading cards and reach thousands of verified buyers"
+    ctaText="Start Selling"
+    ctaHref="#how-it-works"
+  />
+
+  <!-- How It Works -->
+  <section id="how-it-works" class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">How It Works</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {SELLER_PROCESS.map((step) => (
+          <div class="neo-card text-center py-6">
+            <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+              <div class="text-xl font-bold">{step.number}</div>
+            </div>
+            <h3 class="font-display font-bold text-base mb-1">{step.title}</h3>
+            <p class="text-xs text-secondary">{step.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Why Sell on Lock It In</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {SELLER_BENEFITS.map((benefit) => (
+          <div class="neo-card text-center py-6">
+            <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+              <span class="text-2xl">{benefit.icon}</span>
+            </div>
+            <h3 class="font-display font-bold text-base mb-1">{benefit.title}</h3>
+            <p class="text-xs text-secondary">{benefit.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <div class="neo-recess-lg p-8 text-center">
+        <h2 class="font-display font-bold text-3xl mb-4">0% Seller Fees</h2>
+        <p class="text-secondary mb-6">No listing fees. No selling fees. Keep 100% of your earnings during our launch period.</p>
+        <a href="#" class="neo-action neo-action-lg">Start Selling Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container max-w-3xl">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Frequently Asked Questions</h2>
+      <FAQAccordion client:load items={SELLER_FAQS} />
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="neo-container text-center">
+      <a href="#" class="neo-action neo-action-lg">Create Your First Listing</a>
+    </div>
+  </section>
+</BaseLayout>

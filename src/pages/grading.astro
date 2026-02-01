@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PageHero } from '../components/react/PageHero';
+import { FeatureCard } from '../components/react/FeatureCard';
+import { FAQAccordion } from '../components/react/FAQAccordion';
+import { GRADING_COMPANIES, GRADING_TIERS, GRADE_SCALE, GRADING_FAQS } from '../data/grading';
+
+function getGradeColor(grade: number): string {
+  if (grade === 10) return 'text-green-600';
+  if (grade >= 7) return 'text-yellow-600';
+  return 'text-orange-600';
+}
+---
+
+<BaseLayout 
+  title="Card Grading Services - Lock It In"
+  description="Professional PSA, BGS, CGC card grading. Authenticate and protect your trading cards."
+>
+  <!-- Hero -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-8">
+    <PageHero 
+      client:load
+      title="Professional Card Grading"
+      subtitle="Authenticate and preserve your cards with industry-leading grading partners"
+    />
+  </section>
+
+  <!-- Partners -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Our Grading Partners</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {GRADING_COMPANIES.map((company) => (
+          <div class="neo-card p-6">
+            <div class="neo-extrude w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-gradient rounded-xl">
+              {company.name[0]}
+            </div>
+            <h3 class="font-display font-bold text-center mb-1">{company.name}</h3>
+            <p class="text-xs text-secondary text-center mb-2">{company.fullName}</p>
+            <p class="text-xs text-secondary text-center">{company.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">How Grading Works</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <FeatureCard
+          client:load
+          icon="📤"
+          title="Submit"
+          description="Purchase a grading tier and submit your cards through our platform"
+        />
+        <FeatureCard
+          client:load
+          icon="📦"
+          title="Ship"
+          description="Safely package and ship your cards to our partner grading facility"
+        />
+        <FeatureCard
+          client:load
+          icon="🔍"
+          title="Grade"
+          description="Professional graders authenticate and evaluate your cards"
+        />
+        <FeatureCard
+          client:load
+          icon="✨"
+          title="Receive"
+          description="Get your graded cards back in protective cases with certification"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Tiers -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Grading Pricing</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {GRADING_TIERS.map((tier) => (
+          <div class={`neo-extrude p-6 relative ${tier.recommended ? 'ring-2 ring-indigo-500' : ''}`}>
+            {tier.recommended && (
+              <span class="neo-badge-gradient absolute -top-3 left-1/2 -translate-x-1/2">Recommended</span>
+            )}
+            <h3 class="font-display font-bold text-xl text-center mb-2">{tier.name}</h3>
+            <div class="text-center mb-4">
+              <span class="text-3xl font-bold">${tier.price}</span>
+              <span class="text-secondary">/card</span>
+            </div>
+            <p class="text-sm text-secondary text-center mb-4">{tier.turnaroundDays} day turnaround</p>
+            <ul class="space-y-2">
+              {tier.features.map((feature) => (
+                <li class="flex items-center gap-2 text-sm">
+                  <svg class="w-4 h-4 text-green-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Grade Scale -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Grade Scale</h2>
+      <div class="flex flex-wrap justify-center gap-2">
+        {GRADE_SCALE.map((item) => (
+          <div class="neo-recess p-3 text-center min-w-[80px]">
+            <div class={`text-2xl font-bold ${getGradeColor(item.grade)}`}>{item.grade}</div>
+            <div class="text-xs text-secondary">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Benefits of Grading</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <FeatureCard
+          client:load
+          icon="✓"
+          title="Authenticity"
+          description="Know your card is genuine and verified by industry experts"
+        />
+        <FeatureCard
+          client:load
+          icon="🛡️"
+          title="Protection"
+          description="Sealed case preserves condition and prevents damage"
+        />
+        <FeatureCard
+          client:load
+          icon="📈"
+          title="Value"
+          description="Graded cards consistently sell for higher prices"
+        />
+        <FeatureCard
+          client:load
+          icon="🤝"
+          title="Confidence"
+          description="Buy and sell with certainty knowing the exact grade"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="neo-container max-w-3xl">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Grading FAQs</h2>
+      <FAQAccordion client:load items={GRADING_FAQS} />
+    </div>
+  </section>
+</BaseLayout>

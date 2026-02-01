@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { PageHero } from '../components/react/PageHero';
+import { CORE_VALUES, TEAM_MEMBERS, STATS, STORY_PARAGRAPHS } from '../data/about';
+---
+
+<BaseLayout 
+  title="About Us - Lock It In"
+  description="Learn about Lock It In's mission to create the safest trading card marketplace."
+>
+  <!-- Hero with pattern -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-8">
+    <PageHero 
+      client:load
+      title="Built for Collectors, by Collectors"
+      subtitle="Our mission is to make trading cards safer and more accessible"
+      showPattern={true}
+    />
+  </section>
+
+  <!-- Our Story -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <div class="neo-extrude-lg p-8 lg:p-12 max-w-3xl mx-auto">
+        <h2 class="font-display font-bold text-2xl mb-6 text-center">Our Story</h2>
+        <div class="space-y-4">
+          {STORY_PARAGRAPHS.map((paragraph) => (
+            <p class="text-secondary leading-relaxed">{paragraph}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Our Core Values</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {CORE_VALUES.map((value) => (
+          <div class="neo-card text-center py-6">
+            <div class="neo-extrude w-12 h-12 mx-auto mb-3 flex items-center justify-center text-2xl rounded-xl">
+              <span class="text-2xl">{value.icon}</span>
+            </div>
+            <h3 class="font-display font-bold text-base mb-1">{value.title}</h3>
+            <p class="text-xs text-secondary">{value.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {STATS.map((stat) => (
+          <div class="neo-extrude p-6 text-center">
+            <div class="text-3xl lg:text-4xl font-bold text-gradient mb-2">{stat.value}</div>
+            <div class="text-sm text-secondary">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="px-4 sm:px-6 lg:px-8 mb-12">
+    <div class="neo-container">
+      <h2 class="font-display font-bold text-2xl mb-6 text-center">Meet the Team</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+        {TEAM_MEMBERS.map((member) => (
+          <div class="neo-card p-6 text-center">
+            <div class="neo-extrude w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden">
+              <img 
+                src={member.avatarUrl} 
+                alt={member.name}
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <h3 class="font-display font-bold mb-1">{member.name}</h3>
+            <p class="text-sm text-secondary">{member.role}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="neo-container text-center">
+      <h2 class="font-display font-bold text-2xl mb-4">Get in Touch</h2>
+      <p class="text-secondary mb-6">Have questions? We'd love to hear from you.</p>
+      <a href="mailto:support@lockitin.cards" class="neo-button neo-button-lg mb-6 inline-flex items-center gap-2">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+        >
+          <rect width="20" height="16" x="2" y="4" rx="2"/>
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        support@lockitin.cards
+      </a>
+      <div class="flex justify-center gap-4">
+        <a href="#" class="neo-button neo-button-sm">Twitter</a>
+        <a href="#" class="neo-button neo-button-sm">Discord</a>
+        <a href="#" class="neo-button neo-button-sm">Instagram</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
